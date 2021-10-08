@@ -1,7 +1,7 @@
 import csv
 from datetime import datetime
 
-from models import Document
+from app.models import Document
 from app import db
 
 
