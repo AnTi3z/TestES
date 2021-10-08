@@ -1,7 +1,7 @@
 from flask_sqlalchemy import event
 
 from app import db
-from search import add_to_index, remove_from_index, query_index
+from app.search import add_to_index, remove_from_index, query_index
 
 
 class SearchableMixin:

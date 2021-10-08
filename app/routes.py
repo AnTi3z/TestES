@@ -1,7 +1,7 @@
 from flask import request
 
 from app import app
-from models import Document
+from app.models import Document
 
 
 @app.route('/search')
