@@ -1,0 +1,97 @@
+{
+  "openapi" : "3.0.0",
+  "servers" : [ {
+    "description" : "API test-server demonstration",
+    "url" : "https://127.0.0.1:5000/"
+  } ],
+  "info" : {
+    "description" : "This is a simple API",
+    "version" : "1.0.0",
+    "title" : "Simple documents searching API"
+  },
+  "paths" : {
+    "/search" : {
+      "get" : {
+        "summary" : "search records by text",
+        "operationId" : "searchText",
+        "parameters" : [ {
+          "in" : "query",
+          "name" : "q",
+          "description" : "pass a search string for looking up documents inventory",
+          "required" : true,
+          "schema" : {
+            "type" : "string"
+          }
+        } ],
+        "responses" : {
+          "200" : {
+            "description" : "search results matching criteria",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "type" : "array",
+                  "items" : {
+                    "$ref" : "#/components/schemas/DocumentItem"
+                  }
+                }
+              }
+            }
+          },
+          "204" : {
+            "description" : "found no results"
+          }
+        }
+      }
+    },
+    "/{id}" : {
+      "delete" : {
+        "summary" : "delete one record",
+        "operationId" : "deleteDocument",
+        "parameters" : [ {
+          "in" : "path",
+          "name" : "id",
+          "required" : true,
+          "schema" : {
+            "type" : "number",
+            "format" : "int"
+          }
+        } ],
+        "responses" : {
+          "204" : {
+            "description" : "Document succefuly deleted"
+          },
+          "404" : {
+            "description" : "Document with given id not found"
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "DocumentItem" : {
+        "type" : "object",
+        "required" : [ "id", "rubrics", "text", "created_date" ],
+        "properties" : {
+          "id" : {
+            "type" : "number",
+            "format" : "int",
+            "example" : 1083
+          },
+          "text" : {
+            "type" : "string"
+          },
+          "rubrics" : {
+            "type" : "string",
+            "example" : "['VK-1603736028819866', 'VK-11879320040', 'VK-63192684938']"
+          },
+          "created_date" : {
+            "type" : "string",
+            "format" : "date-time",
+            "example" : "2019-05-11 09:12:33"
+          }
+        }
+      }
+    }
+  }
+}
