@@ -1,18 +1,11 @@
-FROM python:3.8-alpine
-
-RUN adduser -D tester
-
-WORKDIR /home/tester
+FROM python:3.8
 
 COPY requirements.txt requirements.txt
 RUN python -m venv venv
 RUN venv/bin/pip install -r requirements.txt
-RUN venv/bin/python db_init.py
 
 COPY app app
-COPY main.py ./
-
-RUN chown -R tester:tester ./
-USER tester
+COPY posts.csv main.py db_init.py start.sh ./
+RUN chmod +x start.sh
 
 EXPOSE 5000

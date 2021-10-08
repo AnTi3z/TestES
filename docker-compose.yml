@@ -1,19 +1,15 @@
-version: "3"
+version: "2.9"
 
 services:
-   es:
+   elastic:
      image: docker.elastic.co/elasticsearch/elasticsearch:7.15.0
      environment:
        - discovery.type=single-node
-     ports:
-       - 9200:9200
-       - 9300:9300
      network_mode: host
-   flask:
-     build: /
-     command: python ./main.py
-     ports:
-       - 5000:5000
+   flask-server:
+     build: .
+     command: .start.sh
      network_mode: host
      depends_on:
-       - es
+       elastic:
+         condition: service_started
