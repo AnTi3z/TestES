@@ -1,6 +1,6 @@
 from flask import request, jsonify
 
-from app import app
+from app import app, db
 from app.models import Document
 
 
@@ -13,9 +13,12 @@ def search_handler():
         response = [row.serialize() for row in reordered_query.limit(20).all()]
         return jsonify(response)
     else:
-        return "No matches found", 404
+        return "", 204
 
 
 @app.route('/<int:doc_id>', methods=['DELETE'])
 def del_handler(doc_id):
-    Document.query.filter_by(id=doc_id).delete()
+    doc = Document.query.get_or_404(id=doc_id)
+    doc.delete()
+    db.session.commit()
+    return "", 204
