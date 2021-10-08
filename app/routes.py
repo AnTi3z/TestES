@@ -19,6 +19,6 @@ def search_handler():
 @app.route('/<int:doc_id>', methods=['DELETE'])
 def del_handler(doc_id):
     doc = Document.query.get_or_404(doc_id)
-    doc.delete()
+    db.session.delete(doc)
     db.session.commit()
     return "", 204
