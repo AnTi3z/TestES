@@ -1,7 +1,7 @@
 from app import app
 
 
-async def main():
+def main():
     app.run()
 
 
