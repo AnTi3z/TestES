@@ -60,3 +60,11 @@ class Document(db.Model, SearchableMixin):
 
     def __repr__(self):
         return f'<Document id:{self.id} date:{self.created_date}>'
+
+    def serialize(self):
+        return {
+            "id": self.id,
+            "rubrics": self.rubrics,
+            "text": self.text,
+            "created_date": self.created_date
+        }

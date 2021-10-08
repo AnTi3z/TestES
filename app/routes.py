@@ -1,4 +1,4 @@
-from flask import request
+from flask import request, jsonify
 
 from app import app
 from app.models import Document
@@ -9,8 +9,11 @@ def search_handler():
     query = request.args['q']
     result = Document.search(query)
     if result[1] > 0:
-        return result[0].order_by(False).order_by(Document.created_date).limit(20).all()
-    return result
+        reordered_query = result[0].order_by(False).order_by(Document.created_date)
+        response = [row.serialize() for row in reordered_query.limit(20).all()]
+        return jsonify(response)
+    else:
+        return "No matches found", 404
 
 
 @app.route('/<int:doc_id>', methods=['DELETE'])
