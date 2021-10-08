@@ -8,7 +8,7 @@ services:
      network_mode: host
    flask-server:
      build: .
-     command: .start.sh
+     command: ./start.sh
      network_mode: host
      depends_on:
        elastic:
