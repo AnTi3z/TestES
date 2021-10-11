@@ -5,8 +5,22 @@ from app.search import add_to_index, remove_from_index, query_index
 
 
 class SearchableMixin:
+    """
+    Mixin класс, для моделей, по полям которых необходимо осуществлять полнотекстовый поиск.
+    Имена аттрибутов, которые должны быть добавлены в индекс, перечисляются в аттрибуте
+    __searchable__(список строк с именами аттрибутов).
+    """
     @classmethod
     async def search(cls, expression: str, page: int = 1, per_page: int = 10000):
+        """
+        Полнотекстовый поиск по аттрибутам объектов модели
+
+        :param expression: Строка поиска
+        :param page: Порядковый номер "страницы" (default: 1)
+        :param per_page: Кол-во результатов на одной "странице" (default: 10000)
+        :return: Список из двух элементов: query-объект запроса, возвращающий объекты удовлетворяющих
+         поисковому запросу и кол-во найденых объектов
+        """
         ids, total = await query_index(cls.__tablename__, expression, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
@@ -38,6 +52,9 @@ class SearchableMixin:
 
     @classmethod
     async def reindex(cls):
+        """
+        Полное обновление индекса в соответствии с моделью
+        """
         for obj in cls.query:
             await add_to_index(cls.__tablename__, obj)
 

@@ -1,3 +1,6 @@
+"""
+Вспомогательные функции для работы с Elasticsearch API
+"""
 from app import es
 
 
