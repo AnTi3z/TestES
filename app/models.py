@@ -30,7 +30,7 @@ class SearchableMixin:
         return cls.query.filter(cls.id.in_(ids)).order_by(db.case(when, value=cls.id)), total
 
     @classmethod
-    async def before_commit(cls, session):
+    def before_commit(cls, session):
         session._changes = {
             'add': list(session.new),
             'update': list(session.dirty),
@@ -38,16 +38,16 @@ class SearchableMixin:
         }
 
     @classmethod
-    async def after_commit(cls, session):
+    def after_commit(cls, session):
         for obj in session._changes['add']:
             if isinstance(obj, SearchableMixin):
-                await add_to_index(obj.__tablename__, obj)
+                add_to_index(obj.__tablename__, obj)
         for obj in session._changes['update']:
             if isinstance(obj, SearchableMixin):
-                await add_to_index(obj.__tablename__, obj)
+                add_to_index(obj.__tablename__, obj)
         for obj in session._changes['delete']:
             if isinstance(obj, SearchableMixin):
-                await remove_from_index(obj.__tablename__, obj)
+                remove_from_index(obj.__tablename__, obj)
         session._changes = None
 
     @classmethod
