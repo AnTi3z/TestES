@@ -4,7 +4,7 @@
 from app import es
 
 
-async def add_to_index(index: str, model):
+def add_to_index(index: str, model):
     """
     Добавляет экземпляр модели в индекс
 
@@ -16,10 +16,10 @@ async def add_to_index(index: str, model):
     payload = {}
     for field in model.__searchable__:
         payload[field] = getattr(model, field)
-    await es.index(index=index, doc_type=index, id=model.id, document=payload)
+    es.index(index=index, doc_type=index, id=model.id, document=payload)
 
 
-async def remove_from_index(index: str, model):
+def remove_from_index(index: str, model):
     """
     Удаляет экземпляр модели из индекса
 
@@ -28,10 +28,10 @@ async def remove_from_index(index: str, model):
     """
     if not es:
         return
-    await es.delete(index=index, doc_type=index, id=model.id)
+    es.delete(index=index, doc_type=index, id=model.id)
 
 
-async def query_index(index: str, query: str, page: int, per_page: int):
+def query_index(index: str, query: str, page: int, per_page: int):
     """
     Полнотекстовый поиск документов в индексе
 
@@ -43,7 +43,7 @@ async def query_index(index: str, query: str, page: int, per_page: int):
     """
     if not es:
         return [], 0
-    search = await es.search(
+    search = es.search(
         index=index,
         query={'multi_match': {'query': query, 'fields': ['*']}},
         from_=(page - 1) * per_page,
