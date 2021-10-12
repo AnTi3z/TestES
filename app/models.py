@@ -1,4 +1,5 @@
 from flask_sqlalchemy import event
+import asyncio
 
 from app import db
 from app.search import add_to_index, remove_from_index, query_index
@@ -38,16 +39,16 @@ class SearchableMixin:
         }
 
     @classmethod
-    def after_commit(cls, session):
+    async def after_commit(cls, session):
         for obj in session._changes['add']:
             if isinstance(obj, SearchableMixin):
-                add_to_index(obj.__tablename__, obj)
+                await add_to_index(obj.__tablename__, obj)
         for obj in session._changes['update']:
             if isinstance(obj, SearchableMixin):
-                add_to_index(obj.__tablename__, obj)
+                await add_to_index(obj.__tablename__, obj)
         for obj in session._changes['delete']:
             if isinstance(obj, SearchableMixin):
-                remove_from_index(obj.__tablename__, obj)
+                await remove_from_index(obj.__tablename__, obj)
         session._changes = None
 
     @classmethod
@@ -60,7 +61,7 @@ class SearchableMixin:
 
 
 event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+event.listen(db.session, 'after_commit', lambda s: asyncio.run(SearchableMixin.after_commit(s)))
 
 
 class Document(db.Model, SearchableMixin):
