@@ -1,5 +1,5 @@
 #!/bin/bash
-host="http://localhost:9200"
+host=${ELASTICSEARCH_URL="http://localhost:9200"}
 
 function elastic_ready {
   health="$(curl -fsSL "$host/_cat/health?h=status")"
