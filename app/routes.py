@@ -5,9 +5,9 @@ from app.models import Document
 
 
 @app.route('/search')
-async def search_doc():
+def search_doc():
     query = request.args['q']
-    result = await Document.search(query)
+    result = Document.search(query)
     if result[1] > 0:
         reordered_query = result[0].order_by(False).order_by(Document.created_date)
         response = [row.serialize() for row in reordered_query.limit(20).all()]
