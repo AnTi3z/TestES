@@ -12,7 +12,7 @@ class SearchableMixin:
     __searchable__(список строк с именами аттрибутов).
     """
     @classmethod
-    def search(cls, expression: str, page: int = 1, per_page: int = 10000):
+    async def search(cls, expression: str, page: int = 1, per_page: int = 10000):
         """
         Полнотекстовый поиск по аттрибутам объектов модели
 
@@ -22,7 +22,7 @@ class SearchableMixin:
         :return: Список из двух элементов: query-объект запроса, возвращающий объекты удовлетворяющих
          поисковому запросу и кол-во найденых объектов
         """
-        ids, total = query_index(cls.__tablename__, expression, page, per_page)
+        ids, total = await query_index(cls.__tablename__, expression, page, per_page)
         if total == 0:
             return cls.query.filter_by(id=0), 0
         when = []
@@ -39,29 +39,29 @@ class SearchableMixin:
         }
 
     @classmethod
-    def after_commit(cls, session):
+    async def after_commit(cls, session):
         for obj in session._changes['add']:
             if isinstance(obj, SearchableMixin):
-                add_to_index(obj.__tablename__, obj)
+                await add_to_index(obj.__tablename__, obj)
         for obj in session._changes['update']:
             if isinstance(obj, SearchableMixin):
-                add_to_index(obj.__tablename__, obj)
+                await add_to_index(obj.__tablename__, obj)
         for obj in session._changes['delete']:
             if isinstance(obj, SearchableMixin):
-                remove_from_index(obj.__tablename__, obj)
+                await remove_from_index(obj.__tablename__, obj)
         session._changes = None
 
     @classmethod
-    def reindex(cls):
+    async def reindex(cls):
         """
         Полное обновление индекса в соответствии с моделью
         """
         for obj in cls.query:
-            add_to_index(cls.__tablename__, obj)
+            await add_to_index(cls.__tablename__, obj)
 
 
 event.listen(db.session, 'before_commit', SearchableMixin.before_commit)
-event.listen(db.session, 'after_commit', SearchableMixin.after_commit)
+event.listen(db.session, 'after_commit', lambda s: asyncio.run(SearchableMixin.after_commit(s)))
 
 
 class Document(db.Model, SearchableMixin):
